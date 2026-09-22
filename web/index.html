@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Agente OC SAP</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+</head>
+<body>
+  <div class="app">
+    <aside class="lateral">
+      <div class="marca">
+        <div class="logo">OC</div>
+        <div>
+          <strong>Agente Órdenes de Compra</strong>
+          <span id="modelo" class="tenue">SAP simulado</span>
+        </div>
+      </div>
+      <p class="tenue pequeno">Casos de prueba</p>
+      <div id="casos" class="casos"></div>
+      <button id="nueva" class="secundario">Nueva sesión</button>
+      <p class="tenue pequeno pie">Cada llamada a herramienta queda visible en el chat y en <code>out/log.jsonl</code>. Resultados de control en <code>out/control.csv</code>.</p>
+    </aside>
+    <main class="chat">
+      <div id="mensajes" class="mensajes">
+        <div class="bienvenida">
+          <h1>Hola 👋</h1>
+          <p>Pídeme procesar una solicitud, por ejemplo:</p>
+          <button class="ejemplo">Procesa la solicitud "sol-004". Muéstrame la OC como quedaría en SAP, qué validaciones pasó y cuáles no, y no la crees hasta que yo lo confirme.</button>
+          <button class="ejemplo">Procesa la solicitud sol-001</button>
+          <button class="ejemplo">¿Qué casos hay pendientes?</button>
+        </div>
+      </div>
+      <div id="confirmar" class="confirmar oculto">
+        <span>⚠️ El agente espera tu confirmación</span>
+        <div>
+          <button id="btnSi">Confirmo, crear la OC</button>
+          <button id="btnNo" class="secundario">No crear</button>
+        </div>
+      </div>
+      <form id="form" class="entrada">
+        <textarea id="texto" rows="1" placeholder="Escribe un mensaje… (Enter para enviar)" required></textarea>
+        <button type="submit" id="enviar">Enviar</button>
+      </form>
+    </main>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
