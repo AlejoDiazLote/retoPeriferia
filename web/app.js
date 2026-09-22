@@ -22,17 +22,31 @@ function md(texto) {
 
 function escapar(t) { return String(t).replace(/[<>&"]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" })[c]) }
 
-function scrollAbajo() { const m = $("mensajes"); m.scrollTop = m.scrollHeight }
+/** Deja la pregunta arriba y la respuesta completa debajo; lo anterior sube. */
+function enfocarTurno(ancla) {
+  const m = $("mensajes")
+  if (!ancla) {
+    m.scrollTop = m.scrollHeight
+    return
+  }
+  const arriba = ancla.getBoundingClientRect().top - m.getBoundingClientRect().top + m.scrollTop
+  m.scrollTo({ top: Math.max(0, arriba - 16), behavior: "smooth" })
+}
+
+function ultimoUsuario() {
+  const usuarios = $("mensajes").querySelectorAll(".msg.usuario")
+  return usuarios[usuarios.length - 1] || null
+}
 
 function quitarBienvenida() { document.querySelector(".bienvenida")?.remove() }
 
-function agregarUsuario(texto) {
+function agregarUsuario(texto, enfocar = true) {
   quitarBienvenida()
   const div = document.createElement("div")
   div.className = "msg usuario"
   div.textContent = texto
   $("mensajes").appendChild(div)
-  scrollAbajo()
+  if (enfocar) enfocarTurno(div)
 }
 
 function renderTool(t) {
@@ -43,7 +57,7 @@ function renderTool(t) {
   return d
 }
 
-function agregarAsistente({ reply, texto, toolCalls = [], needsConfirmation, error }) {
+function agregarAsistente({ reply, texto, toolCalls = [], needsConfirmation, error }, enfocar = true) {
   quitarBienvenida()
   const div = document.createElement("div")
   div.className = `msg asistente${needsConfirmation ? " pide" : ""}${error ? " error" : ""}`
@@ -64,7 +78,7 @@ function agregarAsistente({ reply, texto, toolCalls = [], needsConfirmation, err
   div.appendChild(cuerpo)
   $("mensajes").appendChild(div)
   $("confirmar").classList.toggle("oculto", !needsConfirmation)
-  scrollAbajo()
+  if (enfocar) enfocarTurno(ultimoUsuario() || div)
 }
 
 function pensando(mostrar) {
@@ -74,7 +88,7 @@ function pensando(mostrar) {
   div.className = "pensando"
   div.textContent = "El agente está pensando y usando herramientas…"
   $("mensajes").appendChild(div)
-  scrollAbajo()
+  enfocarTurno(ultimoUsuario() || div)
 }
 
 async function api(ruta, opciones = {}) {
@@ -116,7 +130,8 @@ async function cargarHistorial() {
   if (!sessionId) return
   try {
     const s = await api(`/api/sessions/${sessionId}`)
-    s.historial.forEach((e) => (e.rol === "usuario" ? agregarUsuario(e.texto) : agregarAsistente(e)))
+    s.historial.forEach((e) => (e.rol === "usuario" ? agregarUsuario(e.texto, false) : agregarAsistente(e, false)))
+    enfocarTurno(ultimoUsuario())
   } catch {
     sessionId = null
     localStorageSet("sessionId", null)

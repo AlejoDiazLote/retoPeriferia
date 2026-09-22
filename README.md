@@ -2,18 +2,19 @@
 
 Agente que lee el paquete de una solicitud de compra (correo, solicitud, cotización, aprobación y factura), lo valida contra los maestros (reglas RC1–RC10), construye la OC con trazabilidad, genera la evidencia de aprobación (TXT + PDF con sha256) y la crea en un SAP simulado, pidiendo confirmación humana para las excepciones.
 
-- **Link de prueba:** _ver sección Despliegue_ (`https://<servicio>.up.railway.app`)
-- **Clave de acceso:** no requerida por defecto. Si se define `ACCESS_KEY`, el front la pide al primer mensaje.
+- **Repositorio:** https://github.com/AlejoDiazLote/retoPeriferia
+- **Link de prueba:** el dominio público se genera al desplegar en Railway (sección Despliegue). En local: http://localhost:3000
+- **Clave de acceso:** no requerida por defecto. Si se define `ACCESS_KEY`, el front la pide al primer mensaje. Las claves del modelo no van en el repositorio: solo en `.env`, que está en `.gitignore`.
 
 ## Requisitos
 
 - [Bun](https://bun.sh) ≥ 1.1 (o `npm i -g bun`)
-- Una clave de Anthropic **solo** para el chat. `demo.ts` no necesita ninguna.
+- Una clave de Anthropic o de [Google AI Studio](https://aistudio.google.com/apikey) **solo** para el chat. `demo.ts` no necesita ninguna. No se commitea `.env`.
 
 ## Levantar en local (un comando)
 
 ```bash
-cp .env.example .env        # y pon tu ANTHROPIC_API_KEY
+cp .env.example .env        # pon ANTHROPIC_API_KEY, o GOOGLE_API_KEY y LLM_PROVIDER=google
 bun install && bun run dev  # front + backend en http://localhost:3000
 ```
 
@@ -33,8 +34,11 @@ Limpia `out/`, procesa los 6 casos llamando directamente a las herramientas e im
 
 | Variable | Obligatoria | Descripción |
 |---|---|---|
-| `ANTHROPIC_API_KEY` | Para el chat | Clave del modelo. Solo vive en el backend. |
+| `LLM_PROVIDER` | No | `anthropic` (por defecto) o `google`. |
+| `ANTHROPIC_API_KEY` | Con Anthropic | Clave del modelo. Solo vive en el backend. |
 | `ANTHROPIC_MODEL` | No | Por defecto `claude-opus-5`. Opción económica: `claude-sonnet-5`. |
+| `GOOGLE_API_KEY` | Con Google | Clave gratuita de Gemini (Google AI Studio). Solo vive en el backend. |
+| `GOOGLE_MODEL` | No | Por defecto `gemini-3.1-flash-lite` (capa gratuita, responde en segundos). |
 | `PORT` | No | Puerto HTTP (por defecto 3000). |
 | `MAX_ITERACIONES` | No | Tope de ciclos modelo → herramientas por turno (por defecto 25). |
 | `MAX_TOKENS_SESION` | No | Tope de tokens por sesión (por defecto 300000). |
@@ -81,5 +85,5 @@ demo.ts                         verificación sin modelo
 El repositorio incluye `Dockerfile` y `railway.json` (healthcheck en `/api/health`).
 
 1. Railway → New Project → Deploy from GitHub repo (o `railway up` con la CLI).
-2. Variables: `ANTHROPIC_API_KEY` (y opcionalmente `ACCESS_KEY` y `ANTHROPIC_MODEL`).
+2. Variables en el panel de Railway, nunca en el repositorio: `ANTHROPIC_API_KEY`, o `LLM_PROVIDER=google` y `GOOGLE_API_KEY`. Opcional: `ACCESS_KEY` y el modelo.
 3. Settings → Networking → Generate Domain.
