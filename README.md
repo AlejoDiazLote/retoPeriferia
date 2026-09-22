@@ -3,7 +3,7 @@
 Agente que lee el paquete de una solicitud de compra (correo, solicitud, cotización, aprobación y factura), lo valida contra los maestros (reglas RC1–RC10), construye la OC con trazabilidad, genera la evidencia de aprobación (TXT + PDF con sha256) y la crea en un SAP simulado, pidiendo confirmación humana para las excepciones.
 
 - **Repositorio:** https://github.com/AlejoDiazLote/retoPeriferia
-- **Link de prueba:** el dominio público se genera al desplegar en Railway (sección Despliegue). En local: http://localhost:3000
+- **Link de prueba:** https://reto-periferia-production.up.railway.app
 - **Clave de acceso:** no requerida por defecto. Si se define `ACCESS_KEY`, el front la pide al primer mensaje. Las claves del modelo no van en el repositorio: solo en `.env`, que está en `.gitignore`.
 
 ## Requisitos
