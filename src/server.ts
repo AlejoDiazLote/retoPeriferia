@@ -37,7 +37,7 @@ app.use("/api/*", async (c, next) => {
 app.get("/api/health", (c) => c.json({ ok: true, provider: llm.proveedor, model: llm.modelo }))
 app.get("/api/config", (c) => c.json({ requiereClave: Boolean(accessKey), maxIteraciones: config.maxIteraciones }))
 
-const ChatSchema = z.object({ sessionId: z.string().optional(), message: z.string().trim().min(1).max(4000) })
+const ChatSchema = z.object({ sessionId: z.string().nullish(), message: z.string().trim().min(1).max(4000) })
 
 app.post("/api/chat", async (c) => {
   const cuerpo = ChatSchema.safeParse(await c.req.json().catch(() => null))
@@ -45,7 +45,7 @@ app.post("/api/chat", async (c) => {
   const ip = c.req.header("x-forwarded-for")?.split(",")[0]?.trim() ?? "local"
   if (!permitido(ip)) return c.json({ error: "Demasiados mensajes. Espera unos minutos." }, 429)
 
-  const sesion = await sesiones.obtener(cuerpo.data.sessionId)
+  const sesion = await sesiones.obtener(cuerpo.data.sessionId ?? undefined)
   if (!sesiones.bloquear(sesion.id)) return c.json({ error: "La sesión está procesando otro mensaje." }, 409)
   try {
     sesion.historial.push({ rol: "usuario", texto: cuerpo.data.message, ts: new Date().toISOString() })

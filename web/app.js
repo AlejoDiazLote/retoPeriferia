@@ -97,7 +97,7 @@ async function enviar(texto) {
   agregarUsuario(texto)
   pensando(true)
   try {
-    const r = await api("/api/chat", { method: "POST", body: JSON.stringify({ sessionId, message: texto }) })
+    const r = await api("/api/chat", { method: "POST", body: JSON.stringify({ ...(sessionId ? { sessionId } : {}), message: texto }) })
     sessionId = r.sessionId
     localStorageSet("sessionId", sessionId)
     pensando(false)
